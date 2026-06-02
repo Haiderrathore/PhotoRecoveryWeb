@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://haiderrathore.github.io/PhotoRecoveryWeb/sitemap.xml
