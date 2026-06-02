@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Photo Recovery — Smart Cleaner | Recover Lost Photos on iPhone</title>
+<meta name="description" content="Photo Recovery — Smart Cleaner. Recover deleted photos & videos and free up space on your iPhone. Fast, private, and on-device." />
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300;1,9..144,400;1,9..144,500&family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f6f1;
+    --bg-2: #ffffff;
+    --ink: #0d1f17;
+    --ink-dim: #5d6b63;
+    --line: rgba(13,31,23,0.08);
+    --accent: #3DD598;
+    --accent-dark: #21a874;
+    --accent-2: #f5901e;
+    --glass: rgba(255,255,255,0.6);
+    --display: 'Fraunces', 'Instrument Serif', 'Times New Roman', serif;
+    --sans: 'Manrope', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-weight: 400;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.04 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    opacity: 0.6; pointer-events: none; z-index: 1; mix-blend-mode: multiply;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+    padding: 18px 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    background: rgba(247,246,241,0.7);
+    border-bottom: 1px solid var(--line);
+  }
+  .brand { display: flex; align-items: center; gap: 12px; font-weight: 600; letter-spacing: -0.01em; font-size: 15px; }
+  .brand-mark {
+    width: 36px; height: 36px; border-radius: 9px;
+    background-image: url('icon.png'); background-size: cover; background-position: center;
+    box-shadow: 0 6px 20px rgba(61,213,152,0.35);
+  }
+  .nav-cta {
+    color: var(--bg); text-decoration: none;
+    padding: 10px 20px; border-radius: 999px;
+    background: var(--ink);
+    font-weight: 600; font-size: 13px;
+    transition: transform .2s ease, background .2s ease;
+  }
+  .nav-cta:hover { transform: translateY(-1px); background: var(--accent-dark); }
+
+  /* HERO */
+  .hero {
+    position: relative; z-index: 2;
+    min-height: 100vh; padding: 140px 32px 80px;
+    display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 60px;
+    max-width: 1280px; margin: 0 auto; align-items: center;
+  }
+  .hero-glow {
+    position: absolute; top: 10%; left: -10%;
+    width: 700px; height: 700px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(61,213,152,0.35), transparent 60%);
+    filter: blur(80px); z-index: -1; pointer-events: none;
+  }
+  .hero-glow.b {
+    left: auto; right: -15%; top: 40%;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(245,144,30,0.22), transparent 60%);
+  }
+
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; text-transform: uppercase; letter-spacing: 0.18em;
+    color: var(--ink-dim); padding: 7px 14px;
+    border: 1px solid var(--line); border-radius: 999px;
+    margin-bottom: 28px; background: var(--bg-2);
+  }
+  .eyebrow .dot { width: 7px; height: 7px; background: var(--accent); border-radius: 50%; animation: pulse 2s infinite; box-shadow: 0 0 10px var(--accent); }
+  @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.9); } }
+
+  h1 {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: clamp(48px, 7vw, 92px);
+    line-height: 0.98; letter-spacing: -0.025em;
+    margin-bottom: 28px;
+  }
+  h1 em { font-style: italic; color: var(--accent-dark); position: relative; }
+  h1 em::after {
+    content: ''; position: absolute; left: 0; right: 0; bottom: 0.08em; height: 0.18em;
+    background: var(--accent); opacity: 0.35; z-index: -1; border-radius: 2px;
+  }
+  .lede { font-size: 19px; color: var(--ink-dim); max-width: 480px; margin-bottom: 40px; }
+
+  .cta-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
+  .appstore-btn {
+    display: inline-flex; align-items: center; gap: 14px;
+    background: var(--ink); color: var(--bg);
+    padding: 14px 24px; border-radius: 14px; text-decoration: none;
+    font-weight: 600; transition: all .25s ease;
+    box-shadow: 0 12px 30px rgba(13,31,23,0.18);
+  }
+  .appstore-btn:hover { transform: translateY(-2px); box-shadow: 0 18px 40px rgba(13,31,23,0.25); }
+  .appstore-btn svg { width: 26px; height: 26px; }
+  .appstore-btn .sm { font-size: 11px; opacity: 0.7; line-height: 1; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.1em; }
+  .appstore-btn .lg { font-size: 17px; line-height: 1; }
+  .rating {
+    display: flex; align-items: center; gap: 10px; color: var(--ink-dim); font-size: 13px;
+  }
+  .stars { color: var(--accent-2); letter-spacing: 2px; font-size: 14px; }
+
+  /* HERO RIGHT — ICON SHOWCASE + PHONE */
+  .showcase {
+    position: relative; display: flex; justify-content: center; align-items: center;
+    min-height: 540px;
+  }
+  .icon-display {
+    width: 220px; height: 220px;
+    background-image: url('icon.png');
+    background-size: cover;
+    border-radius: 48px;
+    box-shadow:
+      0 30px 80px rgba(61,213,152,0.4),
+      0 10px 30px rgba(13,31,23,0.15);
+    position: absolute; top: 0; right: 20px;
+    z-index: 3;
+    animation: floatIcon 6s ease-in-out infinite;
+    transform: rotate(-6deg);
+  }
+  @keyframes floatIcon {
+    0%, 100% { transform: rotate(-6deg) translateY(0); }
+    50% { transform: rotate(-6deg) translateY(-14px); }
+  }
+  .phone {
+    width: 280px; aspect-ratio: 9/19;
+    background: linear-gradient(145deg, #1f2520, #0a0d0b);
+    border-radius: 42px;
+    padding: 10px;
+    box-shadow:
+      0 0 0 2px rgba(13,31,23,0.06),
+      0 40px 80px rgba(13,31,23,0.25);
+    position: relative;
+    transform: rotate(4deg);
+    animation: float 6s ease-in-out infinite;
+    margin-top: 60px;
+  }
+  @keyframes float {
+    0%,100% { transform: rotate(4deg) translateY(0); }
+    50% { transform: rotate(4deg) translateY(-12px); }
+  }
+  .phone-screen {
+    width: 100%; height: 100%; border-radius: 32px;
+    background: linear-gradient(180deg, #eafff5, #d4f8e8);
+    position: relative; overflow: hidden;
+  }
+  .phone-notch {
+    position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
+    width: 90px; height: 26px; background: #000; border-radius: 999px; z-index: 5;
+  }
+  .phone-content {
+    padding: 56px 16px 20px;
+    height: 100%; display: flex; flex-direction: column;
+  }
+  .phone-header {
+    text-align: center; margin-bottom: 14px;
+  }
+  .phone-header .title {
+    font-family: var(--display); font-size: 18px; color: var(--ink);
+    line-height: 1; margin-bottom: 3px;
+  }
+  .phone-header .sub {
+    font-size: 9px; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.15em;
+  }
+  .scan-line {
+    position: absolute; left: 10px; right: 10px; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    box-shadow: 0 0 16px var(--accent);
+    animation: scan 3s ease-in-out infinite; z-index: 4;
+  }
+  @keyframes scan {
+    0% { top: 18%; opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { top: 88%; opacity: 0; }
+  }
+  .phone-stats { display: flex; flex-direction: column; gap: 8px; margin-top: auto; }
+  .phone-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px;
+    margin-bottom: 12px;
+  }
+  .phone-grid img {
+    width: 100%; aspect-ratio: 1; object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(13,31,23,0.15);
+    background: #e8f5ee;
+  }
+  .phone-stat {
+    background: rgba(255,255,255,0.85); backdrop-filter: blur(12px);
+    border: 1px solid rgba(61,213,152,0.2);
+    padding: 10px 12px; border-radius: 12px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 11px; color: var(--ink-dim);
+  }
+  .phone-stat strong { font-family: var(--display); font-size: 18px; font-weight: 400; color: var(--ink); }
+  .phone-stat.highlight { background: var(--accent); border-color: var(--accent-dark); }
+  .phone-stat.highlight, .phone-stat.highlight strong { color: #fff; }
+
+  /* SECTION TEMPLATE */
+  section { position: relative; z-index: 2; padding: 100px 32px; max-width: 1280px; margin: 0 auto; }
+  .section-label {
+    font-size: 12px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--accent-dark); margin-bottom: 16px; font-weight: 700;
+  }
+  h2 {
+    font-family: var(--display); font-weight: 400;
+    font-size: clamp(36px, 5vw, 64px); line-height: 1.02;
+    letter-spacing: -0.02em; margin-bottom: 24px; max-width: 800px;
+  }
+  h2 em { font-style: italic; color: var(--accent-dark); }
+
+  /* FEATURES */
+  .features-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+    margin-top: 60px;
+  }
+  .feature {
+    padding: 32px 28px;
+    border: 1px solid var(--line); border-radius: 20px;
+    background: var(--bg-2);
+    transition: all .3s ease; position: relative; overflow: hidden;
+  }
+  .feature:hover {
+    border-color: var(--accent);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(61,213,152,0.15);
+  }
+  .feature-icon {
+    width: 52px; height: 52px; border-radius: 14px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    display: grid; place-items: center; margin-bottom: 24px;
+    box-shadow: 0 8px 20px rgba(61,213,152,0.35);
+  }
+  .feature-icon svg { width: 24px; height: 24px; stroke: #fff; fill: none; stroke-width: 2; }
+  .feature h3 { font-family: var(--display); font-weight: 400; font-size: 26px; margin-bottom: 10px; letter-spacing: -0.01em; }
+  .feature p { font-size: 15.5px; color: var(--ink-dim); }
+
+  /* HOW IT WORKS */
+  .how-wrap {
+    background: var(--bg-2);
+    margin-top: 40px;
+  }
+  .how { padding: 120px 32px; max-width: 1280px; margin: 0 auto; }
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin-top: 60px; }
+  .step { position: relative; }
+  .step-num {
+    font-family: var(--display); font-size: 88px; color: var(--accent);
+    line-height: 0.9; margin-bottom: 12px; font-style: italic;
+    position: relative; display: inline-block; isolation: isolate;
+  }
+  .step-num::before {
+    content: ''; position: absolute;
+    top: 50%; left: 50%; transform: translate(-50%, -45%);
+    width: 220px; height: 220px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(61,213,152,0.30) 0%, rgba(61,213,152,0.12) 40%, transparent 70%);
+    z-index: -1; pointer-events: none;
+    filter: blur(8px);
+  }
+  .step h4 { font-family: var(--display); font-weight: 400; font-size: 28px; margin-bottom: 10px; letter-spacing: -0.01em; }
+  .step p { color: var(--ink-dim); font-size: 16px; }
+
+  /* GALLERY */
+  .gallery {
+    display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px;
+    margin-top: 60px;
+  }
+  .gallery img {
+    width: 100%; aspect-ratio: 1; object-fit: cover;
+    border-radius: 16px;
+    transition: all .4s ease;
+    box-shadow: 0 8px 20px rgba(13,31,23,0.08);
+  }
+  .gallery img:hover { transform: scale(1.03) translateY(-4px); box-shadow: 0 16px 30px rgba(13,31,23,0.15); }
+
+  /* CTA BAND */
+  .cta-band {
+    text-align: center; padding: 140px 32px;
+    background: linear-gradient(180deg, var(--accent) 0%, var(--accent-dark) 100%);
+    position: relative; margin-top: 60px; overflow: hidden;
+    max-width: none;
+  }
+  .cta-band::before {
+    content: ''; position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.12 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    opacity: 0.5; pointer-events: none;
+  }
+  .cta-band > * { position: relative; z-index: 2; }
+  .cta-band h2 { margin-left: auto; margin-right: auto; color: #fff; }
+  .cta-band h2 em { color: #fff; font-weight: 500; }
+  .cta-band p { color: rgba(255,255,255,0.9); font-size: 18px; max-width: 520px; margin: 0 auto 40px; }
+  .cta-band .appstore-btn { background: #fff; color: var(--ink); }
+  .cta-band .appstore-btn:hover { background: var(--bg); }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 40px 32px; text-align: center;
+    color: var(--ink-dim); font-size: 13px;
+    position: relative; z-index: 2;
+    background: var(--bg-2);
+  }
+  footer .brand-mini {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: var(--display); font-size: 22px; color: var(--ink); margin-bottom: 14px;
+  }
+  footer .brand-mini-mark {
+    width: 28px; height: 28px; border-radius: 7px;
+    background-image: url('icon.png'); background-size: cover;
+  }
+  footer a { color: var(--ink-dim); text-decoration: none; margin: 0 12px; transition: color .2s; }
+  footer a:hover { color: var(--accent-dark); }
+
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity .8s ease, transform .8s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+
+  /* RESPONSIVE */
+  @media (max-width: 880px) {
+    nav { padding: 14px 18px; }
+    .nav-cta { padding: 9px 16px; font-size: 12px; }
+    .hero {
+      grid-template-columns: 1fr; padding: 110px 20px 60px;
+      text-align: center; gap: 40px;
+    }
+    .hero .text { order: 2; }
+    .hero .showcase { order: 1; min-height: 460px; }
+    .eyebrow { margin-left: auto; margin-right: auto; }
+    .lede { margin-left: auto; margin-right: auto; }
+    .cta-row { justify-content: center; }
+    .icon-display { width: 150px; height: 150px; right: auto; left: 10%; top: 10px; }
+    .phone { width: 220px; margin-top: 40px; }
+    section { padding: 70px 20px; }
+    .how { padding: 80px 20px; }
+    .features-grid { grid-template-columns: 1fr; gap: 16px; }
+    .steps { grid-template-columns: 1fr; gap: 32px; }
+    .gallery { grid-template-columns: repeat(3, 1fr); }
+    .cta-band { padding: 90px 20px; margin-top: 40px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">
+    <div class="brand-mark"></div>
+    <span>Photo Recovery</span>
+  </div>
+  <a class="nav-cta" href="https://apps.apple.com/pk/app/photo-recovery-smartcleaner/id6744826748" target="_blank" rel="noopener">Get the App</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-glow b"></div>
+  <div class="text reveal">
+    <span class="eyebrow"><span class="dot"></span> Available on the App Store</span>
+    <h1>Recover what was <em>lost.</em> Reclaim what's left.</h1>
+    <p class="lede">Effortlessly recover deleted photos and restore lost videos with the most trusted recovery app for iPhone and iPad — quickly, safely, and with high accuracy.</p>
+    <div class="cta-row">
+      <a class="appstore-btn" href="https://apps.apple.com/pk/app/photo-recovery-smartcleaner/id6744826748" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.04c-.03-2.92 2.39-4.34 2.5-4.41-1.36-1.99-3.48-2.26-4.24-2.29-1.81-.18-3.53 1.06-4.45 1.06-.92 0-2.33-1.04-3.83-1.01-1.97.03-3.79 1.14-4.81 2.9-2.05 3.56-.53 8.83 1.47 11.72.97 1.42 2.13 3.01 3.65 2.95 1.47-.06 2.02-.95 3.8-.95s2.28.95 3.83.92c1.58-.03 2.58-1.45 3.55-2.87 1.12-1.65 1.58-3.25 1.6-3.33-.04-.02-3.06-1.18-3.07-4.69zM14.21 3.5c.82-.99 1.36-2.36 1.21-3.74-1.17.05-2.59.78-3.43 1.76-.75.88-1.41 2.28-1.23 3.63 1.3.1 2.62-.66 3.45-1.65z"/></svg>
+        <div><div class="sm">Download on the</div><div class="lg">App Store</div></div>
+      </a>
+      <div class="rating">
+        <span class="stars">★★★★★</span>
+        <span>Loved by iPhone users</span>
+      </div>
+    </div>
+  </div>
+  <div class="showcase reveal">
+    <div class="icon-display"></div>
+    <div class="phone">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div class="scan-line"></div>
+        <div class="phone-content">
+          <div class="phone-header">
+            <div class="title">Recovered photos</div>
+            <div class="sub">6 of 1,284 shown</div>
+          </div>
+          <div class="phone-grid">
+            <img src="https://images.unsplash.com/photo-1777838186814-eb17423386ef?q=80&w=400&auto=format&fit=crop" alt="">
+            <img src="https://plus.unsplash.com/premium_photo-1777272106360-61bae1535c70?q=80&w=400&auto=format&fit=crop" alt="">
+            <img src="https://plus.unsplash.com/premium_photo-1727942418440-d085b3b5f065?q=80&w=400&auto=format&fit=crop" alt="">
+            <img src="https://images.unsplash.com/photo-1779992176955-1cc41d823b55?q=80&w=400&auto=format&fit=crop" alt="">
+            <img src="https://images.unsplash.com/photo-1778084765767-e676ef3a2beb?q=80&w=400&auto=format&fit=crop" alt="">
+            <img src="https://images.unsplash.com/photo-1778110843326-71684d993dd7?q=80&w=400&auto=format&fit=crop" alt="">
+          </div>
+          <div class="phone-stats">
+            <div class="phone-stat highlight"><span>Recoverable</span><strong>1,284</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="reveal">
+    <div class="section-label">Features</div>
+    <h2>Recover your memories, <em>secure</em> what matters.</h2>
+  </div>
+  <div class="features-grid">
+    <div class="feature reveal">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-6.2-8.55"/><polyline points="21 4 21 10 15 10"/></svg>
+      </div>
+      <h3>Photo Recovery</h3>
+      <p>Instantly restore deleted or lost photos from your iPhone or iPad storage. Bring back memories you thought were gone forever.</p>
+    </div>
+    <div class="feature reveal">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+      </div>
+      <h3>Video Recovery</h3>
+      <p>Bring back accidentally deleted or missing videos in just seconds. Never lose a precious moment again.</p>
+    </div>
+    <div class="feature reveal">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/><path d="M11 8v6M8 11h6"/></svg>
+      </div>
+      <h3>Deep Scan Recovery</h3>
+      <p>Scan your entire device for hidden or previously deleted media files buried deep in iOS storage.</p>
+    </div>
+    <div class="feature reveal">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </div>
+      <h3>Preview Before Restore</h3>
+      <p>View all recoverable photos and videos before restoring them. Know exactly what you're getting back.</p>
+    </div>
+    <div class="feature reveal">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+      <h3>Secure Vault</h3>
+      <p>Protect recovered photos and videos in a private, password-protected folder. Your memories, locked and safe.</p>
+    </div>
+    <div class="feature reveal">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+      <h3>Quick & Lightweight</h3>
+      <p>Designed for fast scanning and recovery without slowing down your device. Results in seconds, not minutes.</p>
+    </div>
+  </div>
+</section>
+
+<div class="how-wrap">
+  <div class="how">
+    <div class="reveal">
+      <div class="section-label">How it works</div>
+      <h2>Three taps to <em>recover</em> what's lost.</h2>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step-num">01</div>
+        <h4>Install & Deep Scan</h4>
+        <p>Download the app, grant photo access, and let Photo Recovery deep scan your entire device for deleted media.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">02</div>
+        <h4>Preview & Restore</h4>
+        <p>Browse all recoverable photos and videos. Preview every file before restoring — know exactly what you're getting back.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">03</div>
+        <h4>Secure in Vault</h4>
+        <p>Restore your memories and lock them in a password-protected vault. Safe, private, and always accessible.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section>
+  <div class="reveal">
+    <div class="section-label">Your library, restored</div>
+    <h2>From accidentally deleted to <em>safely</em> recovered.</h2>
+  </div>
+  <div class="gallery">
+    <img class="reveal" src="https://images.unsplash.com/photo-1777838186814-eb17423386ef?q=80&w=600&auto=format&fit=crop" alt="" loading="lazy">
+    <img class="reveal" src="https://images.unsplash.com/photo-1778110843326-71684d993dd7?q=80&w=600&auto=format&fit=crop" alt="" loading="lazy">
+    <img class="reveal" src="https://plus.unsplash.com/premium_photo-1727942418440-d085b3b5f065?q=80&w=600&auto=format&fit=crop" alt="" loading="lazy">
+    <img class="reveal" src="https://images.unsplash.com/photo-1779992176955-1cc41d823b55?q=80&w=600&auto=format&fit=crop" alt="" loading="lazy">
+    <img class="reveal" src="https://images.unsplash.com/photo-1778084765767-e676ef3a2beb?q=80&w=600&auto=format&fit=crop" alt="" loading="lazy">
+    <img class="reveal" src="https://plus.unsplash.com/premium_photo-1777272106360-61bae1535c70?q=80&w=600&auto=format&fit=crop" alt="" loading="lazy">
+  </div>
+</section>
+
+<section class="cta-band reveal">
+  <h2>Your memories deserve a <em>second chance</em>.</h2>
+  <p>Download Photo Recovery today — recover deleted photos and videos, and secure them in your private vault.</p>
+  <a class="appstore-btn" href="https://apps.apple.com/pk/app/photo-recovery-smartcleaner/id6744826748" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.04c-.03-2.92 2.39-4.34 2.5-4.41-1.36-1.99-3.48-2.26-4.24-2.29-1.81-.18-3.53 1.06-4.45 1.06-.92 0-2.33-1.04-3.83-1.01-1.97.03-3.79 1.14-4.81 2.9-2.05 3.56-.53 8.83 1.47 11.72.97 1.42 2.13 3.01 3.65 2.95 1.47-.06 2.02-.95 3.8-.95s2.28.95 3.83.92c1.58-.03 2.58-1.45 3.55-2.87 1.12-1.65 1.58-3.25 1.6-3.33-.04-.02-3.06-1.18-3.07-4.69zM14.21 3.5c.82-.99 1.36-2.36 1.21-3.74-1.17.05-2.59.78-3.43 1.76-.75.88-1.41 2.28-1.23 3.63 1.3.1 2.62-.66 3.45-1.65z"/></svg>
+    <div><div class="sm">Download on the</div><div class="lg">App Store</div></div>
+  </a>
+</section>
+
+<footer>
+  <div class="brand-mini">
+    <div class="brand-mini-mark"></div>
+    Photo Recovery
+  </div>
+  <div>
+    <a href="https://apps.apple.com/pk/app/photo-recovery-smartcleaner/id6744826748" target="_blank" rel="noopener">App Store</a> ·
+    <a href="https://doc-hosting.flycricket.io/photo-recovery-videos-recovery-privacy-policy/b1727af7-f37a-4686-b37d-f925a1e26218/privacy" target="_blank" rel="noopener">Privacy</a> ·
+    <a href="mailto:Umairafzal10@yahoo.com">Support</a>
+  </div>
+  <div style="margin-top: 18px; opacity: 0.6;">© 2026 Photo Recovery. Made for iPhone.</div>
+</footer>
+
+<script>
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('in');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+
+</body>
+</html>
